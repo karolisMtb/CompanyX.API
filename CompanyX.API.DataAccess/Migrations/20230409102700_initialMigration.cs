@@ -10,28 +10,11 @@ namespace CompanyX.API.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "HomeAddresses",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StreetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HouseNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AdditionalAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PostalCode = table.Column<int>(type: "int", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HomeAddresses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,9 +65,6 @@ namespace CompanyX.API.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Employees");
-
-            migrationBuilder.DropTable(
-                name: "HomeAddresses");
 
             migrationBuilder.DropTable(
                 name: "Roles");

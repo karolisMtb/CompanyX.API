@@ -1,6 +1,7 @@
 ﻿using CompanyX.API.DataAccess.DatabaseContext;
 using CompanyX.API.DataAccess.Entities;
 using CompanyX.API.DataAccess.Interfaces;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace CompanyX.API.DataAccess.Repositories
@@ -18,23 +19,30 @@ namespace CompanyX.API.DataAccess.Repositories
             _employeeRepository = employeeRepository;
         }
 
-        public async Task ClearDatabaseAsync()
+        private async Task ClearDatabaseAsync()
         {
             _companyXDbContext.Employees.RemoveRange(_companyXDbContext.Employees);
-            _companyXDbContext.HomeAddresses.RemoveRange(_companyXDbContext.HomeAddresses);
+            //_companyXDbContext.HomeAddresses.RemoveRange(_companyXDbContext.HomeAddresses);
             _companyXDbContext.Roles.RemoveRange(_companyXDbContext.Roles);
             await SaveChangesAsync();
         }
 
         public async Task SeedInitialDataAsync(List<Employee> employees, List<Role> roles)
         {
-            await ClearDatabaseAsync();
-            await _companyXDbContext.Roles.AddRangeAsync(roles);
-
-            await _employeeRepository.AddEmployees(employees);
-
-            await _companyXDbContext.Employees.AddRangeAsync(employees);
-            await SaveChangesAsync();
+            try
+            {
+                await ClearDatabaseAsync();
+                await _employeeRepository.AddEmployees(employees);
+                await SaveChangesAsync();
+            }
+            catch(ValidationException ex)
+            {
+                _logger.LogError($"Database seeding failed. Validation exception occurred: {ex.Message}");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Database seeding failed. Error occurred: {ex.Message}");
+            }
         }
 
         private async Task SaveChangesAsync()

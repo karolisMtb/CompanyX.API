@@ -9,7 +9,6 @@ namespace CompanyX.API.DataAccess.Interfaces
 {
     public interface IDataSeedingRepository
     {
-        Task ClearDatabaseAsync();
         Task SeedInitialDataAsync(List<Employee> employees, List<Role> roles);
     }
 }

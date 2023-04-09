@@ -4,11 +4,11 @@ using CompanyX.API.DataAccess.Interfaces;
 
 namespace CompanyX.API.Services
 {
-    public class CompanyXService : ICompanyXService
+    public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
 
-        public CompanyXService(IEmployeeRepository employeeRepository)
+        public EmployeeService(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }

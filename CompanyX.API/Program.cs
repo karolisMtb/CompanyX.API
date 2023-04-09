@@ -1,12 +1,14 @@
 using CompanyX.API.BusinessLogic.Interfaces;
 using CompanyX.API.BusinessLogic.Services;
 using CompanyX.API.DataAccess.DatabaseContext;
+using CompanyX.API.DataAccess.Entities;
 using CompanyX.API.DataAccess.Interfaces;
 using CompanyX.API.DataAccess.Repositories;
+using CompanyX.API.DataAccess.Validators;
+using FluentValidation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ builder.Services.AddDbContext<CompanyXDbContext>(options => options.UseSqlServer
 builder.Services.AddScoped<IDataSeedingService, DataSeedingService>();
 builder.Services.AddScoped<IDataSeedingRepository, DataSeedingRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -41,10 +44,10 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("SQL server error occurred: " + ex.Message);
     }
-    catch (ValidationException ex)
-    {
-        Console.WriteLine("Validation error occurred: " + ex.Message);
-    }
+    //catch (ValidationException ex)
+    //{
+    //    Console.WriteLine("Validation error occurred: " + ex.Message);
+    //}
     catch (Exception ex)
     {
         Console.WriteLine("Server error occurred: " + ex.Message);

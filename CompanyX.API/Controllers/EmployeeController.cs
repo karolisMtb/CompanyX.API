@@ -6,7 +6,7 @@ namespace CompanyX.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CompanyXController : ControllerBase
+    public class EmployeeController : ControllerBase
     {
         [HttpGet]
         [Route("Employee/{id}")]

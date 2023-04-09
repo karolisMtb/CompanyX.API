@@ -4,6 +4,7 @@ using CompanyX.API.DataAccess.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanyX.API.DataAccess.Migrations
 {
     [DbContext(typeof(CompanyXDbContext))]
-    partial class CompanyXDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230409125924_addedAStringLengthRestriction")]
+    partial class addedAStringLengthRestriction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

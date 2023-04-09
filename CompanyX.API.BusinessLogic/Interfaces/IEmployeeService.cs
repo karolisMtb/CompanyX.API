@@ -2,7 +2,7 @@
 
 namespace CompanyX.API.BusinessLogic.Interfaces
 {
-    public interface ICompanyXService
+    public interface IEmployeeService
     {
         Task<Employee> GetEmployeeByIdAsync(Guid employeeId);
         Task<IEnumerable<Employee>> GetEmployeesByNameAndBirthDateAsync(string name, DateTime birthdateFrom, DateTime birthDateTo);

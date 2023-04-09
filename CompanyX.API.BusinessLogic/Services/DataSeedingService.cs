@@ -19,13 +19,12 @@ namespace CompanyX.API.BusinessLogic.Services
 
         public async Task SeedInitialDataAsync()
         {
-            await _dataSeedingRepository.ClearDatabaseAsync();
             await _dataSeedingRepository.SeedInitialDataAsync(_employees, _roles);            
         }
 
         private void GetRoles()
         {
-            _roles.Add(new Role { Name= JobTitle.Ceo} );
+            _roles.Add(new Role { Name = JobTitle.Ceo });
             _roles.Add(new Role { Name = JobTitle.Biologist });
             _roles.Add(new Role { Name = JobTitle.Tester });
             _roles.Add(new Role { Name = JobTitle.ProjectManager });
@@ -39,41 +38,24 @@ namespace CompanyX.API.BusinessLogic.Services
             _employees.Add(
                 new Employee
                 {
-                    FirstName = "Coral",
-                    LastName = "Trout",
-                    BirthDate = new DateTime(2015,07,06), 
-                    EmploymentDate = new DateTime(2015,07,06), 
-                    CurentSalary = 1750.00M,
-                    Role = _roles.First(x=>x.Name == JobTitle.Ceo),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Ceo).Id
+                    FirstName = "Bruce",
+                    LastName = "Willis",
+                    BirthDate = new DateTime(1987,03,12), 
+                    EmploymentDate = new DateTime(2000,01,02), 
+                    CurentSalary = 2680.00M,
+                    Role = _roles.First(x => x.Name == JobTitle.Ceo),
                 });
-
-            _employees.Add(
-    new Employee
-    {
-        FirstName = "Coralfdfdsfd",
-        LastName = "Troutsfdfsd",
-        BirthDate = new DateTime(2015, 07, 06),
-        EmploymentDate = new DateTime(2015, 07, 06),
-        CurentSalary = 1750.00M,
-        Role = _roles.First(x => x.Name == JobTitle.Ceo),
-        RoleId = _roles.First(x => x.Name == JobTitle.Ceo).Id
-    });
-
-
 
             _employees.Add(
                 new Employee
                 {
                     FirstName = "Luke",
                     LastName = "Brian",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1968, 11, 25),
+                    EmploymentDate = new DateTime(2002, 01, 02),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 2310.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Biologist),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Biologist).Id
                 });
 
             _employees.Add(
@@ -81,104 +63,95 @@ namespace CompanyX.API.BusinessLogic.Services
                 {
                     FirstName = "Ann",
                     LastName = "Chovey",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1991, 06, 06),
+                    EmploymentDate = new DateTime(2010, 10, 09),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x=>x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
-                    Role = _roles.First(x => x.Name == JobTitle.Chemist),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Chemist).Id
+                    CurentSalary = 1860.00M,
+                    Role = _roles.First(x => x.Name == JobTitle.Biologist),
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "Barry",
                     LastName = "Cuda",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1995, 04, 25),
+                    EmploymentDate = new DateTime(2013, 05, 01),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x=>x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 2100.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Tester),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Tester).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "John",
                     LastName = "Dory",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1980, 09, 03),
+                    EmploymentDate = new DateTime(2014, 03, 01),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 1980.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Supervisor),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Supervisor).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "John",
                     LastName = "Deer",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1965, 12, 24),
+                    EmploymentDate = new DateTime(2015, 02, 15),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 1280.00M,
                     Role = _roles.First(x => x.Name == JobTitle.ProjectManager),
-                    RoleId = _roles.First(x => x.Name == JobTitle.ProjectManager).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "Red",
                     LastName = "Salmon",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2010, 09, 15),
+                    BirthDate = new DateTime(1978, 06, 19),
+                    EmploymentDate = new DateTime(2012, 04, 15),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 1820.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Security),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Security).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "Tiger",
                     LastName = "Prawn",
-                    BirthDate = new DateTime(2015, 07, 06),
+                    BirthDate = new DateTime(1966, 08, 20),
                     EmploymentDate = new DateTime(2010, 09, 15),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 1650.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Chemist),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Chemist).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "Mayden",
                     LastName = "Deer",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2010, 09, 15),
+                    BirthDate = new DateTime(2000, 05, 25),
+                    EmploymentDate = new DateTime(2020, 07, 01),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 2510.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Biologist),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Biologist).Id
                 });
 
             _employees.Add(
-                new Employee{
+                new Employee
+                {
                     FirstName = "Rock",
                     LastName = "Lobster",
-                    BirthDate = new DateTime(2015, 07, 06),
-                    EmploymentDate = new DateTime(2010, 09, 15),
+                    BirthDate = new DateTime(1999, 03, 13),
+                    EmploymentDate = new DateTime(2018, 11, 01),
                     Boss = _employees.First(x => x.Role.Name == JobTitle.Ceo),
-                    BossId = _employees.First(x => x.Role.Name == JobTitle.Ceo).Id,
-                    CurentSalary = 1750.00M,
+                    CurentSalary = 975.00M,
                     Role = _roles.First(x => x.Name == JobTitle.Supervisor),
-                    RoleId = _roles.First(x => x.Name == JobTitle.Supervisor).Id
                 });
         }
     }

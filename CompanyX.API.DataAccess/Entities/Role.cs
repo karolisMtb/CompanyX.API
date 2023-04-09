@@ -11,5 +11,8 @@ namespace CompanyX.API.DataAccess.Entities
         public Guid Id { get; set; }
 
         public JobTitle Name { get; set; }
+
+        public List<Employee> Employees { get; set; }
+
     }
 }
