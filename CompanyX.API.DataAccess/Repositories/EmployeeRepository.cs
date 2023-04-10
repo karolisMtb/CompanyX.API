@@ -6,26 +6,89 @@ using Microsoft.Extensions.Logging;
 using FluentValidation;
 using ValidationException = FluentValidation.ValidationException;
 using CompanyX.API.DataAccess.Enums;
-using System.Collections.Generic;
+using CompanyX.API.DataAccess.Models;
+using System;
 
 namespace CompanyX.API.DataAccess.Repositories
 {
-    public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         protected readonly CompanyXDbContext _companyXDbContext;
         protected readonly ILogger<IEmployeeRepository> _logger;
         private readonly IValidator<Employee> _employeeValidator;
 
-        public EmployeeRepository(CompanyXDbContext companyXDbContext, ILogger<IEmployeeRepository> logger, IValidator<Employee> employeeValidator) : base(companyXDbContext)
+        public EmployeeRepository(CompanyXDbContext companyXDbContext, ILogger<IEmployeeRepository> logger, IValidator<Employee> employeeValidator)
         {
             _logger = logger;
             _companyXDbContext = companyXDbContext;
             _employeeValidator = employeeValidator;
         }
 
-        public async Task DeleteEmployee(Guid employeeId)
+        public async  Task<Employee> GetEmployeeById(Guid id)
         {
-            _companyXDbContext.Employees.Remove(await GetEmployeeById(employeeId));
+ 
+            var employee = await _companyXDbContext.Employees.FirstOrDefaultAsync(employee => employee.Id == id);
+
+            if (employee == null)
+            {
+                throw new FileNotFoundException($"Employee with an id {id} was not found.");
+            }
+
+            return employee;
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByNameAndBirthdateIntervalAsync(string name, DateTime dateOfBirthFrom, DateTime dateOfBirthTo)
+        {
+            var employees = await _companyXDbContext.Employees.Where(x => x.FirstName == name && x.BirthDate > dateOfBirthFrom && x.BirthDate < dateOfBirthTo).ToListAsync();
+
+            if (employees.Count == 0)
+            {
+                throw new FileNotFoundException($"No employees with name {name} and birthdate interval from {dateOfBirthFrom} to {dateOfBirthTo} were found.");
+            }
+
+            return employees;
+        }
+
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        {
+            var allEmployees = await _companyXDbContext.Employees.ToListAsync();
+
+            return allEmployees;
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByBossIdAsync(Guid id)
+        {
+            var bossExists = _companyXDbContext.Employees.Any(x => x.Role.Name == JobTitle.Ceo && x.Id == id);
+
+            if (!bossExists)
+            {
+                throw new FileNotFoundException($"Boss with a given id {id} does not exist.");
+            }
+
+            return await _companyXDbContext.Employees.Where(x => x.Boss.Id == id).ToListAsync();
+        }
+
+        public async Task<EmployeeStatistic> GetRoleStatisticsAsync(JobTitle role)
+        {
+            EmployeeStatistic employeeStatistic = new EmployeeStatistic();
+            employeeStatistic.JobTitle = role.ToString();
+            employeeStatistic.EmployeeCount = await _companyXDbContext.Employees.Where(x => x.Role.Name == role).CountAsync();
+            employeeStatistic.AverageWage = _companyXDbContext.Employees.Where(x => x.Role.Name == role).Select(x => x.CurentSalary).ToList().Sum() / employeeStatistic.EmployeeCount;
+            return employeeStatistic;
+        }
+
+        public async Task AddEmployeeAsync(Employee employee)
+        {
+            await ValidateEmployee(employee);
+            await _companyXDbContext.Employees.AddAsync(employee);
+            await SaveChangesAsync();
+        }
+
+        public async Task DeleteEmployeeAsync(Guid employeeId)
+        {
+            var employee = await GetEmployeeById(employeeId);
+            _companyXDbContext.Employees.Remove(employee);
+            await SaveChangesAsync();
         }
 
         public async Task AddEmployees(List<Employee> employees)
@@ -35,44 +98,13 @@ namespace CompanyX.API.DataAccess.Repositories
             await SaveChangesAsync();
         }
 
-
-        public async Task AddEmployee(Employee employee)
-        {
-            await ValidateEmployee(employee);
-            await _companyXDbContext.Employees.AddAsync(employee);
-            await SaveChangesAsync();
-        }
-
-        public async Task<IEnumerable<Employee>> GetEmployeeByFilter(string name, DateTime dateOfBirthFrom, DateTime dateOfBirthTo)
-        {
-            return await _companyXDbContext.Employees.Where(x => x.FirstName == name).Where(x => x.BirthDate > dateOfBirthFrom && x.BirthDate < dateOfBirthTo).ToListAsync();
-        }
-
-        public async  Task<Employee> GetEmployeeById(Guid id)
-        {
-            return await _companyXDbContext.Employees.FirstOrDefaultAsync(employee => employee.Id == id);
-        }
-
-        public async Task<IEnumerable<Employee>> GetEmployeesByBossId(Guid id)
-        {
-            //return await _companyXDbContext.Employees.Where(x => x.BossId == id).ToListAsync();
-            return null;
-        }
-
-        public async Task<Dictionary<int, decimal>> GetEmployeeStatistics(string role)
-        {
-            Dictionary<int, decimal> statistics = new Dictionary<int, decimal>();
-            //int employeeCount = await _companyXDbContext.Employees.Where(x => x.Role.Name == role).CountAsync();
-            //decimal averageSalary = _companyXDbContext.Employees.Where(x => x.Role.Name == role).Select(x => x.CurentSalary).ToList().Sum() / employeeCount;
-            //statistics.TryAdd(employeeCount, averageSalary);
-            return statistics;
-        }
-
         public async Task UpdateSalary(Guid employeeId, decimal salary)
         {
-            Employee employee = await GetEmployeeById(employeeId);
+            Employee employee = await _companyXDbContext.Employees.Include(x => x.HomeAddress).Include(x => x.Role).Include(x => x.Boss).FirstAsync(x => x.Id == employeeId);
             employee.CurentSalary = salary;
+            await RunFluentValidation(employee);
             _companyXDbContext.Employees.Update(employee);
+            await SaveChangesAsync();
         }
 
         public async Task SaveChangesAsync()
@@ -80,20 +112,46 @@ namespace CompanyX.API.DataAccess.Repositories
             await _companyXDbContext.SaveChangesAsync();
         }
 
-        Task<Employee> IEmployeeRepository.GetEmployeeByFilter(string name, DateTime dateOfBirthFrom, DateTime dateOfBirthTo)
+        public async Task<Employee> CreateNewEmployeeAsync(EmployeeData employeeData)
         {
-            throw new NotImplementedException();
+            HomeAddress homeAddress = new HomeAddress
+            {
+                StreetName = employeeData.StreetName,
+                HouseNumber = employeeData.HouseNumber,
+                City = employeeData.City,
+                PostalCode = employeeData.PostalCode
+            };
+
+            Employee employee = new Employee
+            {
+                FirstName = employeeData.Name,
+                LastName = employeeData.LastName,
+                BirthDate = employeeData.BirthDate,
+                EmploymentDate = employeeData.EmploymentDate,
+                CurentSalary = employeeData.CurrentSalary,
+                HomeAddress = homeAddress,
+                Role = await _companyXDbContext.Roles.FirstAsync(x => x.Id == employeeData.RoleId),
+                Boss = await _companyXDbContext.Employees.FirstAsync(x => x.Id == employeeData.BossId)
+            };
+
+            return employee;
         }
 
-        public async Task<Guid> GetRoleIdByName(string role)
+        public async Task UpdateEmployeeAsync(Employee existingEmployee, Employee newEmployee)
         {
-            //if(!_companyXDbContext.Roles.Where(x => x.Name == role).Any())
-            //{
-            //    _logger.LogError("Entry could not be found");
-            //}
+            await RunFluentValidation(newEmployee);
+            existingEmployee = newEmployee;
+            _companyXDbContext.Employees.Update(existingEmployee);
+            await SaveChangesAsync();
+        }
 
-            //return  _companyXDbContext.Roles.FirstOrDefault(x => x.Name == role).Id;
-            return Guid.NewGuid();
+        public async Task<Guid> GetRoleIdByName(JobTitle role)
+        {
+            if (!_companyXDbContext.Roles.Where(x => x.Name == role).Any())
+            {
+                _logger.LogError("Role could not be found");
+            }
+            return _companyXDbContext.Roles.FirstOrDefault(x => x.Name == role).Id;
         }
 
         private async Task ValidateEmployees(List<Employee> employees)
@@ -139,6 +197,8 @@ namespace CompanyX.API.DataAccess.Repositories
                 throw new ValidationException(result.Errors[0].ErrorMessage);
             }
         }
+
+
 
     }
 }

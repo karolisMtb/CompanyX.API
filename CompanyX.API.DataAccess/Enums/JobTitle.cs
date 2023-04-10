@@ -8,7 +8,7 @@ namespace CompanyX.API.DataAccess.Enums
 {
     public enum JobTitle
     {
-        Chemist,
+        Chemist = 1,
         Biologist,
         Tester,
         Supervisor,

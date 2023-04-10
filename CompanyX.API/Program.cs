@@ -5,30 +5,34 @@ using CompanyX.API.DataAccess.Entities;
 using CompanyX.API.DataAccess.Interfaces;
 using CompanyX.API.DataAccess.Repositories;
 using CompanyX.API.DataAccess.Validators;
+using CompanyX.API.Services;
 using FluentValidation;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<CompanyXDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection")), ServiceLifetime.Transient);
 builder.Services.AddScoped<IDataSeedingService, DataSeedingService>();
 builder.Services.AddScoped<IDataSeedingRepository, DataSeedingRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Version = "V1",
-        Title = "CompanyX MGMT System",
+        Version = "v1",
+        Title = "Company X Management System",
     });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
 var app = builder.Build();
@@ -44,17 +48,12 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("SQL server error occurred: " + ex.Message);
     }
-    //catch (ValidationException ex)
-    //{
-    //    Console.WriteLine("Validation error occurred: " + ex.Message);
-    //}
     catch (Exception ex)
     {
         Console.WriteLine("Server error occurred: " + ex.Message);
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

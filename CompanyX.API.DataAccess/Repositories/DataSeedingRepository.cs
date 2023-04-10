@@ -22,7 +22,7 @@ namespace CompanyX.API.DataAccess.Repositories
         private async Task ClearDatabaseAsync()
         {
             _companyXDbContext.Employees.RemoveRange(_companyXDbContext.Employees);
-            //_companyXDbContext.HomeAddresses.RemoveRange(_companyXDbContext.HomeAddresses);
+            _companyXDbContext.HomeAddresses.RemoveRange(_companyXDbContext.HomeAddresses);
             _companyXDbContext.Roles.RemoveRange(_companyXDbContext.Roles);
             await SaveChangesAsync();
         }

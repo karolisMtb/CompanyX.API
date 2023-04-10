@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CompanyX.API.DataAccess.Migrations
 {
     [DbContext(typeof(CompanyXDbContext))]
-    [Migration("20230409102700_initialMigration")]
+    [Migration("20230410085017_initialMigration")]
     partial class initialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,11 +44,16 @@ namespace CompanyX.API.DataAccess.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("HomeAddressId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
@@ -57,9 +62,37 @@ namespace CompanyX.API.DataAccess.Migrations
 
                     b.HasIndex("BossId");
 
+                    b.HasIndex("HomeAddressId");
+
                     b.HasIndex("RoleId");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("CompanyX.API.DataAccess.Entities.HomeAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostalCode")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StreetName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HomeAddresses");
                 });
 
             modelBuilder.Entity("CompanyX.API.DataAccess.Entities.Role", b =>
@@ -83,6 +116,12 @@ namespace CompanyX.API.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("BossId");
 
+                    b.HasOne("CompanyX.API.DataAccess.Entities.HomeAddress", "HomeAddress")
+                        .WithMany("Employees")
+                        .HasForeignKey("HomeAddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CompanyX.API.DataAccess.Entities.Role", "Role")
                         .WithMany("Employees")
                         .HasForeignKey("RoleId")
@@ -91,7 +130,14 @@ namespace CompanyX.API.DataAccess.Migrations
 
                     b.Navigation("Boss");
 
+                    b.Navigation("HomeAddress");
+
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("CompanyX.API.DataAccess.Entities.HomeAddress", b =>
+                {
+                    b.Navigation("Employees");
                 });
 
             modelBuilder.Entity("CompanyX.API.DataAccess.Entities.Role", b =>

@@ -1,6 +1,8 @@
 ﻿using CompanyX.API.BusinessLogic.Interfaces;
 using CompanyX.API.DataAccess.Entities;
+using CompanyX.API.DataAccess.Enums;
 using CompanyX.API.DataAccess.Interfaces;
+using CompanyX.API.DataAccess.Models;
 
 namespace CompanyX.API.Services
 {
@@ -13,50 +15,55 @@ namespace CompanyX.API.Services
             _employeeRepository = employeeRepository;
         }
 
+        public async Task<Employee> GetEmployeeByIdAsync(Guid employeeId)
+        {
+            return await _employeeRepository.GetEmployeeById(employeeId);
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByNameAndBirthdateIntervalAsync(string name, DateTime birthdateFrom, DateTime birthDateTo)
+        {
+            return await _employeeRepository.GetEmployeesByNameAndBirthdateIntervalAsync(name, birthdateFrom, birthDateTo);
+        }
+
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        {
+            return await _employeeRepository.GetAllEmployeesAsync();
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesByBossIdAsync(Guid bossId)
+        {
+            return await _employeeRepository.GetEmployeesByBossIdAsync(bossId);
+        }
+
+       public async Task<EmployeeStatistic> GetRoleStatisticsAsync(JobTitle role)
+        {
+            return await _employeeRepository.GetRoleStatisticsAsync(role);
+        }
+
         public async Task AddNewEmployeeAsync(Employee employee)
         {
-            Employee newEmployee = new Employee();
-            newEmployee = employee;
+            await _employeeRepository.AddEmployeeAsync(employee);
         }
 
-        public Task DeleteEmployeeAsync(Guid employeeId)
+        public async Task UpdateEmployeeAsync(Employee newEmployee)
         {
-            throw new NotImplementedException();
+            Employee existingEmployee = await GetEmployeeByIdAsync(newEmployee.Id);
+            await _employeeRepository.UpdateEmployeeAsync(existingEmployee, newEmployee);
         }
 
-        public Task<IEnumerable<Employee>> GetAllAsync()
+        public async Task DeleteEmployeeAsync(Guid employeeId)
         {
-            throw new NotImplementedException();
+            await _employeeRepository.DeleteEmployeeAsync(employeeId);
         }
 
-        public Task<Employee> GetEmployeeByIdAsync(Guid employeeId)
+        public async Task<Employee> CreateNewEmployeeAsync(EmployeeData employeeData)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<Dictionary<int, decimal>> GetEmployeeSalaryAverageAsync(string role)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Employee>> GetEmployeesByBossIdAsync(Guid bossId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Employee>> GetEmployeesByNameAndBirthDateAsync(string name, DateTime birthdateFrom, DateTime birthDateTo)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateEmployeeAsync(Employee employee)
-        {
-            throw new NotImplementedException();
+            return await _employeeRepository.CreateNewEmployeeAsync(employeeData);
         }
 
         public Task UpdateEmployeeSalary(Guid employeeId, decimal salary)
         {
-            throw new NotImplementedException();
+            return _employeeRepository.UpdateSalary(employeeId, salary);
         }
     }
 }
